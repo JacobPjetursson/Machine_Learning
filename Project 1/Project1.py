@@ -6,25 +6,16 @@ Created on Tue Sep 19 16:20:42 2017
 @author: Jacob
 """
 import numpy as np
+import pandas as pd
 from matplotlib.pyplot import boxplot, figure, subplot, hist, xlabel, ylim, show
-from numpy import genfromtxt
+from sklearn.preprocessing import StandardScaler
 
-movieData = genfromtxt('movie_metadata.csv', delimiter=',',dtype=None, names=True, usecols=(8,9,12,22,25))
-numbersData = genfromtxt('movie_metadata.csv', delimiter=',', dtype=None, names=True, usecols=(8,12,22,25))
-attributeNamesNumbers = numbersData.dtype.names
-attributeNames = movieData.dtype.names
-
-
-M = len(attributeNamesNumbers)
-#for i in attributeNamesNumbers:
- #       print(i)
-        #hist(movieData["" + i])
-for i in attributeNames:
-        print(i)
-        
-figure(figsize=(8,7))
-u = np.floor(np.sqrt(M)); v = np.ceil(float(M)/u)
-#for i in range(M):
-   # subplot(u,v,i+1)
-   # hist(movieData[:,i], color=(0.2, 0.8-i*0.2, 0.4))
-  #  xlabel(attributeNamesNumbers[i])
+fields= ['budget','gross','genres', 'imdb_score', 'num_voted_users']
+numberFields = ['budget','gross', 'imdb_score', 'num_voted_users']
+movie = pd.read_csv('movie.csv', encoding="latin-1",usecols=fields)
+numbersData = pd.read_csv('movie.csv', encoding="latin-1",usecols=numberFields)
+numbersData = numbersData.fillna(value=0, axis=1) # TODO - Wrong to swap with 0
+X = numbersData.values
+# Data Normalization
+X_std = StandardScaler().fit_transform(X)
+numbersData.plot(y= 'imdb_score', x ='gross',kind='hexbin',gridsize=35, sharex=False, colormap='cubehelix', title='Hexbin of Imdb_Score and Gross',figsize=(12,8))
