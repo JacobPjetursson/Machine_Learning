@@ -14,10 +14,16 @@ import numpy as np
 import dataSetup
 
 PredictedVal = 'gross'
-X = dataSetup.numbersData.drop(PredictedVal,axis=1).values
 # NORMALIZE THE DATA?
-X = StandardScaler().fit_transform(X)
+
+X = dataSetup.numbersData.drop(PredictedVal,axis=1).values
+#X = StandardScaler().fit_transform(X)
+
 y = dataSetup.numbersData[PredictedVal].values.squeeze()
+#y = y.reshape(-1,1)
+#y = StandardScaler().fit_transform(y)
+#y = y.ravel()
+
 attributeNames = dataSetup.numbersData.drop(PredictedVal,axis=1).columns.values
 N,M = X.shape
 K = 5
@@ -80,7 +86,8 @@ for train_index, test_index in CV:
     print('Train indices: {0}'.format(train_index))
     print('Test indices: {0}'.format(test_index))
     print('Features no: {0}'.format(selected_features.size))
-    print(m.coef_)
+    print('Coefficients: ' + str(m.coef_))
+    print('intercept: ' + str(m.intercept_))
     print("\n")
     k+=1
 
@@ -88,13 +95,13 @@ for train_index, test_index in CV:
 # Display results
 print('\n')
 print('Linear regression without feature selection:\n')
-print('- Training error: {0}'.format(Error_train.mean()))
-print('- Test error:     {0}'.format(Error_test.mean()))
+print('- Mean Squared Training error: {0}'.format(Error_train.mean()))
+print('- Mean Squared Test error:     {0}'.format(Error_test.mean()))
 print('- R^2 train:     {0}'.format((Error_train_nofeatures.sum()-Error_train.sum())/Error_train_nofeatures.sum()))
 print('- R^2 test:     {0}'.format((Error_test_nofeatures.sum()-Error_test.sum())/Error_test_nofeatures.sum()))
 print('Linear regression with feature selection:\n')
-print('- Training error: {0}'.format(Error_train_fs.mean()))
-print('- Test error:     {0}'.format(Error_test_fs.mean()))
+print('- Mean Squared Training error: {0}'.format(Error_train_fs.mean()))
+print('- Mean Squared Test error:     {0}'.format(Error_test_fs.mean()))
 print('- R^2 train:     {0}'.format((Error_train_nofeatures.sum()-Error_train_fs.sum())/Error_train_nofeatures.sum()))
 print('- R^2 test:     {0}'.format((Error_test_nofeatures.sum()-Error_test_fs.sum())/Error_test_nofeatures.sum()))
 
@@ -119,6 +126,8 @@ else:
     m = lm.LinearRegression(fit_intercept=True).fit(X[:,ff], y)
     
     y_est= m.predict(X[:,ff])
+    print("Estimated point: " + str(y_est[1]))
+    print(dataSetup.numbersData.loc[1])
     residual=y-y_est
     
     figure(k+1)
@@ -127,7 +136,6 @@ else:
        subplot(2,np.ceil(len(ff)/2.0),i+1)
        plot(X[:,ff[i]],residual,'.')
        xlabel(attributeNames[ff[i]])
-       ylabel('residual error')
-    
-    
+       ylabel('residual error')   
+    figure(k+1).tight_layout()
     show() 

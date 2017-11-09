@@ -36,14 +36,14 @@ X = stats.zscore(X);
 
 
 # Parameters for neural network classifier
-n_hidden_units = 5      # number of hidden units
+n_hidden_units = 10      # number of hidden units to loop through (Testing for 0 to number)
 n_train = 2             # number of networks trained in each k-fold
 learning_goal = 100     # stop criterion 1 (train mse to be reached)
-max_epochs = 5         # stop criterion 2 (max epochs in training)
+max_epochs = 5        # stop criterion 2 (max epochs in training)
 show_error_freq = 5     # frequency of training status updates
 
 # K-fold crossvalidation
-K = 3                   # only five folds to speed up this example
+K = 4                   # only five folds to speed up this example
 CV = model_selection.KFold(K,shuffle=True)
 
 # Variable for classification error
@@ -61,18 +61,20 @@ for train_index, test_index in CV.split(X,y):
     y_test = y[test_index]
     
     best_train_error = 1e100
-    for i in range(n_train):
-        print('Training network {0}/{1}...'.format(i+1,n_train))
-        # Create randomly initialized network with 2 layers
-        ann = nl.net.newff([[-3, 3]]*M, [n_hidden_units, 1], [nl.trans.TanSig(),nl.trans.PureLin()])
-        if i==0:
-            bestnet.append(ann)
-        # train network
-        train_error = ann.train(X_train, y_train.reshape(-1,1), goal=learning_goal, epochs=max_epochs, show=show_error_freq)
-        if train_error[-1]<best_train_error:
-            bestnet[k]=ann
-            best_train_error = train_error[-1]
-            error_hist[range(len(train_error)),k] = train_error
+    for i in range(n_hidden_units):
+        print('Trying with hidden units: ' + str(i+1))
+        for j in range(n_train):
+            print('Training network {0}/{1}...'.format(j+1,n_train))
+            # Create randomly initialized network with 2 layers
+            ann = nl.net.newff([[-3, 3]]*M, [i+1, 1], [nl.trans.TanSig(),nl.trans.PureLin()])
+            if i==0 and j == 0:
+                bestnet.append(ann)
+            # train network
+            train_error = ann.train(X_train, y_train.reshape(-1,1), goal=learning_goal, epochs=max_epochs, show=show_error_freq)
+            if train_error[-1]<best_train_error:
+                bestnet[k]=ann
+                best_train_error = train_error[-1]
+                error_hist[range(len(train_error)),k] = train_error
 
     print('Best train error: {0}...'.format(best_train_error))
     y_est = bestnet[k].sim(X_test).squeeze()
