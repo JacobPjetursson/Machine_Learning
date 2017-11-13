@@ -24,6 +24,7 @@ C = 2
 
 # Normalize data
 X = stats.zscore(X);
+y= stats.zscore(y);
                 
 ## Normalize and compute PCA (UNCOMMENT to experiment with PCA preprocessing)
 #Y = stats.zscore(X,0);
@@ -36,21 +37,22 @@ X = stats.zscore(X);
 
 
 # Parameters for neural network classifier
-n_hidden_units = 10      # number of hidden units to loop through (Testing for 0 to number)
+n_hidden_units = 3      # number of hidden units to loop through (Testing for 0 to number)
 n_train = 2             # number of networks trained in each k-fold
 learning_goal = 100     # stop criterion 1 (train mse to be reached)
-max_epochs = 5        # stop criterion 2 (max epochs in training)
+max_epochs = 25        # stop criterion 2 (max epochs in training)
 show_error_freq = 5     # frequency of training status updates
 
 # K-fold crossvalidation
-K = 4                   # only five folds to speed up this example
+K = 5                  # only five folds to speed up this example
 CV = model_selection.KFold(K,shuffle=True)
 
 # Variable for classification error
-errors = np.zeros(K)
+errors = np.empty((K,1))
 error_hist = np.zeros((max_epochs,K))
 bestnet = list()
 k=0
+best_train_error = 1e100
 for train_index, test_index in CV.split(X,y):
     print('\nCrossvalidation fold: {0}/{1}'.format(k+1,K))    
     
@@ -59,14 +61,12 @@ for train_index, test_index in CV.split(X,y):
     y_train = y[train_index]
     X_test = X[test_index,:]
     y_test = y[test_index]
-    
-    best_train_error = 1e100
     for i in range(n_hidden_units):
-        print('Trying with hidden units: ' + str(i+1))
+        print('Trying with hidden units: ' + str(i+12))
         for j in range(n_train):
             print('Training network {0}/{1}...'.format(j+1,n_train))
             # Create randomly initialized network with 2 layers
-            ann = nl.net.newff([[-3, 3]]*M, [i+1, 1], [nl.trans.TanSig(),nl.trans.PureLin()])
+            ann = nl.net.newff([[-3, 3]]*M, [i+12, 1], [nl.trans.TanSig(),nl.trans.PureLin()])
             if i==0 and j == 0:
                 bestnet.append(ann)
             # train network
@@ -89,6 +89,6 @@ figure(figsize=(6,7));
 subplot(2,1,1); bar(range(0,K),errors); title('Mean-square errors');
 subplot(2,1,2); plot(error_hist); title('Training error as function of BP iterations');
 figure(figsize=(6,7));
-subplot(2,1,1); plot(y_est); plot(y_test); title('Last CV-fold: est_y vs. test_y'); 
-subplot(2,1,2); plot((y_est-y_test)); title('Last CV-fold: prediction error (est_y-test_y)'); 
+subplot(2,1,1); plot(y_est); plot(y_test); title('Average neural net across all CV-folds: est_y vs. test_y'); 
+subplot(2,1,2); plot((y_est-y_test)); title('Average neural net across all CV-folds: prediction error (est_y-test_y)'); 
 show()

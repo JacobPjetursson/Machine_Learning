@@ -9,20 +9,21 @@ from matplotlib.pyplot import figure, plot, subplot, title, xlabel, ylabel, show
 from toolbox_02450 import feature_selector_lr, bmplot
 import sklearn.linear_model as lm
 from sklearn import cross_validation
-from sklearn.preprocessing import StandardScaler
+from sklearn import preprocessing
 import numpy as np
+from scipy import stats
 import dataSetup
 
 PredictedVal = 'gross'
-# NORMALIZE THE DATA?
+
 
 X = dataSetup.numbersData.drop(PredictedVal,axis=1).values
-#X = StandardScaler().fit_transform(X)
-
 y = dataSetup.numbersData[PredictedVal].values.squeeze()
-#y = y.reshape(-1,1)
-#y = StandardScaler().fit_transform(y)
-#y = y.ravel()
+
+# NORMALIZED
+X = stats.zscore(X);
+y= stats.zscore(y);
+
 
 attributeNames = dataSetup.numbersData.drop(PredictedVal,axis=1).columns.values
 N,M = X.shape
@@ -46,7 +47,7 @@ for train_index, test_index in CV:
     y_train = y[train_index]
     X_test = X[test_index,:]
     y_test = y[test_index]
-    internal_cross_validation = 10
+    internal_cross_validation = 20
     
     # Compute squared error without using the input data at all
     Error_train_nofeatures[k] = np.square(y_train-y_train.mean()).sum()/y_train.shape[0]
@@ -104,6 +105,8 @@ print('- Mean Squared Training error: {0}'.format(Error_train_fs.mean()))
 print('- Mean Squared Test error:     {0}'.format(Error_test_fs.mean()))
 print('- R^2 train:     {0}'.format((Error_train_nofeatures.sum()-Error_train_fs.sum())/Error_train_nofeatures.sum()))
 print('- R^2 test:     {0}'.format((Error_test_nofeatures.sum()-Error_test_fs.sum())/Error_test_nofeatures.sum()))
+print('Blind guessing:\n')
+print('Mean Squared error of blind guessing (no input data): {0}'.format(Error_test_nofeatures.mean()))
 
 
 figure(k)
@@ -126,8 +129,9 @@ else:
     m = lm.LinearRegression(fit_intercept=True).fit(X[:,ff], y)
     
     y_est= m.predict(X[:,ff])
+
     print("Estimated point: " + str(y_est[1]))
-    print(dataSetup.numbersData.loc[1])
+    print("Predictions is based off: " + str(X[1]))
     residual=y-y_est
     
     figure(k+1)
