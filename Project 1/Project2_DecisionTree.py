@@ -14,9 +14,9 @@ N = setup.N
 
 # Tree complexity parameter - constraint on maximum depth
 tc = np.arange(2, 21, 1)
-print(y)
+
 # K-fold crossvalidation
-K = 25
+K = 100
 CV = cross_validation.KFold(N,K,shuffle=True)
 
 # Initialize variable

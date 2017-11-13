@@ -14,7 +14,7 @@ import numpy as np
 # Maximum number of neighbors
 L=40
 
-K = 75
+K = 100
 N = setup.N
 X = setup.X
 y = setup.y
@@ -40,7 +40,6 @@ for train_index, test_index in CV:
         errors[i,l-1] = np.sum(y_est[0]!=y_test[0])
 
     i+=1
-print(errors.shape)
 # Plot the classification error rate
 figure()
 plot(sum(errors,0)/K)
