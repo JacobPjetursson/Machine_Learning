@@ -7,16 +7,20 @@ Created on Mon Nov 27 21:27:49 2017
 from scipy.io import loadmat
 from toolbox_02450 import clusterplot
 from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
-from Classification import *
+from matplotlib.pyplot import figure
+import pca as pca
+
+
+X = pca.x_2d
 
 # Perform hierarchical/agglomerative clustering on data matrix
-Method = 'single'
+Method = 'ward'
 Metric = 'euclidean'
 
 Z = linkage(X, method=Method, metric=Metric)
 
 # Compute and display clusters by thresholding the dendrogram
-Maxclust = 4
+Maxclust = 10
 cls = fcluster(Z, criterion='maxclust', t=Maxclust)
 figure(1)
 clusterplot(X, cls.reshape(cls.shape[0],1), y=y)
