@@ -38,10 +38,12 @@ for train_index, test_index in CV:
         knclassifier.fit(X_train, y_train);
         y_est = knclassifier.predict(X_test);
         errors[i,l-1] = np.sum(y_est[0]!=y_test[0])
+        
 
     i+=1
 # Plot the classification error rate
 figure()
+print(errors[1])
 plot(sum(errors,0)/K)
 
 best = 100
