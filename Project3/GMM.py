@@ -20,9 +20,10 @@ T = len(KRange)
 
 X = stats.zscore(X)
 
-X = X[:1000]
 #X = np.random.shuffle(X)
-print(X.shape)
+X = X[:1000]
+
+print(type(X))
 
 
 covar_type = 'full'     # you can try out 'diag' as well

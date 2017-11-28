@@ -17,11 +17,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+from scipy import stats
 from dataSetup import *
-
-
+X = stats.zscore(X)
 pca = PCA(n_components=2)
-x_2d = pca.fit_transform(X_std[:2000])
+x_2d = pca.fit_transform(X_std)
 
 #print(x_2d.shape)
 """
