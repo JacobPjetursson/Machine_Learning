@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from similarity import binarize
 from writeapriorifile import WriteAprioriFile
-from scipy import stats
 import numpy as np
 from subprocess import run
 import re
@@ -42,8 +41,8 @@ maxRule = 4
 
 # Run Apriori Algorithm
 print('Mining for frequent itemsets by the Apriori algorithm')
-status1 = run('apriori{1} -f"," -s{2} -v"[Sup. %S]" {3} apriori_temp1.txt'
-              .format(dir_sep, ext, minSup, filename ), shell=True)
+status1 = run('apriori{0} -f"," -s{1} -v"[Sup. %S]" {2} apriori_temp1.txt'
+              .format(ext, minSup, filename ), shell=True)
 
 if status1.returncode != 0:
     print('An error occurred while calling apriori, a likely cause is that minSup was set to high such that no '
@@ -51,8 +50,8 @@ if status1.returncode != 0:
     exit()
 if minConf > 0:
     print('Mining for associations by the Apriori algorithm')
-    status2 = run('apriori{1} -tr -f"," -n{2} -c{3} -s{4} -v"[Conf. %C,Sup. %S]" {5} apriori_temp2.txt'
-                  .format(dir_sep, ext, maxRule, minConf, minSup, filename ), shell=True)
+    status2 = run('apriori{0} -tr -f"," -n{1} -c{2} -s{3} -v"[Conf. %C,Sup. %S]" {4} apriori_temp2.txt'
+                  .format(ext, maxRule, minConf, minSup, filename ), shell=True)
 
     if status2.returncode != 0:
         print('An error occurred while calling apriori')
@@ -69,7 +68,7 @@ sup = np.zeros((len(lines), 1))
 for i, line in enumerate(lines):
     FrequentItemsets[i] = line[0:-1]
     sup[i] = re.findall(' [-+]?\d*\.\d+|\d+]', line)[0][1:-1]
-os.remove('apriori_temp1.txt')
+#os.remove('apriori_temp1.txt')
 
 # Read the file
 f = open('apriori_temp2.txt', 'r')
@@ -100,4 +99,3 @@ print('\n')
 print('Association rules:')
 for i, item in enumerate(AssocRulesSorted):
     print('Rule: {0}'.format(item))
-
